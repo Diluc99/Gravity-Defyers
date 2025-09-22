@@ -18,14 +18,14 @@ void loop() {
   // put your main code here, to run repeatedly:
   int16_t ax,ay,az; // accelerometer values
   int16_t gx,gy,gz; // gyroscope values
-  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+  mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz); // reading values from MPU6050
   Serial.print("Accel: ");
-  Serial.print(ax); Serial.print(", ");
-  Serial.print(ay); Serial.print(", ");
-  Serial.print(az); Serial.print(" | ");
+  Serial.print("ax: ");Serial.print(ax); Serial.print(", ");
+  Serial.print("ay: ");Serial.print(ay); Serial.print(", ");
+  Serial.print("az: ");Serial.print(az); Serial.print(" | ");
    Serial.print("Gyro: ");
-  Serial.print(gx); Serial.print(", ");
-  Serial.print(gy); Serial.print(", ");
-  Serial.println(gz);
+  Serial.print("gx: ");Serial.print(gx); Serial.print(", ");
+  Serial.print("gy: ");Serial.print(gy); Serial.print(", ");
+  Serial.print("gz: ");Serial.println(gz);
   delay(250); 
 }
