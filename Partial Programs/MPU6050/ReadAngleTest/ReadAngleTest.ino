@@ -20,7 +20,7 @@ void loop() {
   int16_t gx,gy,gz; // gyroscope values
   mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz); // reading values from MPU6050
 
-  float angle = atan2(ax,az); // give angle of rotation around y axis ignoring movement in x axis
+  float angle = atan2(ax,az)*180/PI; // give angle of rotation around y axis ignoring movement in x axis
   Serial.print("angle: ");Serial.println(angle);
   delay(250); 
 }
