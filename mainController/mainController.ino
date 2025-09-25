@@ -4,22 +4,23 @@
 MPU6050 mpu;  //MPU6050 OBject
 // imu varibles
 float acc_angle_pitch; 
-float gyro_rate_y; 
+float gyro_rate_y;
+float gyroX_offset = 0, gyroY_offset = 0, gyroZ_offset = 0; 
 float current_angle=0; 
 float alpha = 0.96; //Complementary filter coefficient (0.98 = trust gyro 98%, accel 2%)
 float dt = 0.005; // Loop time (5ms for 200Hz). Adjust based on actual loop time.
 unsigned long prev_time = 0;
-//float acc_angle_x;
 
+float target_angle = 0.0; // the position we want to achieve and hold
 //PID VARIABLES
-float positional = 0; 
+float error = 0; 
 float previous_error = 0;
 float integral = 0; 
 float derivative = 0;
 float pidVal = 0; // final Pid value
 
 //PID CONSTANTS(I'VE TO TEST AND SET, keeping 0 for now)
-float Kp =0;
+float Kp =10;
 float Ki =0;
 float Kd =0;
 
@@ -54,6 +55,7 @@ float Kd =0;
     current_angle = alpha * (current_angle + gyro_rate_y * dt) + (1 - alpha) * acc_angle_pitch;
     delay(100);
     printAngle();
+    calculatePID();
   }
 
   void readIMU() {
@@ -95,7 +97,7 @@ float Kd =0;
   Serial.print(" Z: "); Serial.println(gyroZ_offset);
  }
   
-void MotorControls(){
+/*void MotorControls(){
   if(){//pid condtion will add later
    RIGHT_DIR_PIN=HIGH;
    LEFT_DIR_PIN=LOW
@@ -109,4 +111,15 @@ void MotorControls(){
   digitalWrite(RIGHT_PUL_PIN,LOW;
   digitalWrite(LEFT_PUL_PIN,LOW);
   //delay(####); //speed will map with pid 
+} */
+
+  void calculatePID(){
+  error = current_angle - target_angle;
+  integral += error * dt;
+  derivative = (error - previous_error) / dt;
+  previous_error = error;
+  pidVal = (Kp * error) + (Ki * integral) + (Kd * derivative);
+  Serial.println("Pid value: ");
+  Serial.println(pidVal);
 }
+
