@@ -20,15 +20,17 @@ float derivative = 0;
 float pidVal = 0; 
 
 //PID CONSTANTS(I'VE TO TEST AND SET, keeping 0 for now)
-float Kp =1;
+float Kp =15;
 float Ki =0;
-float Kd =0;
+float Kd =0.5;
 
 // Motor Pins
   #define RIGHT_PUL_PIN 32
   #define RIGHT_DIR_PIN 33
   #define LEFT_PUL_PIN 25
   #define LEFT_DIR_PIN 26
+  #define LEFT_EN_PIN 14
+  #define RIGHT_EN_PIN 19
 
   void setup(){
   Serial.begin(115200);
@@ -45,6 +47,10 @@ float Kd =0;
     pinMode(RIGHT_DIR_PIN,OUTPUT);
     pinMode(LEFT_PUL_PIN ,OUTPUT);
     pinMode(LEFT_DIR_PIN ,OUTPUT);
+    pinMode(LEFT_EN_PIN,OUTPUT);
+    pinMode(RIGHT_EN_PIN,OUTPUT);
+    digitalWrite(RIGHT_EN_PIN, LOW);   // Enable right motor
+    digitalWrite(LEFT_EN_PIN, LOW);
     prev_time = micros();
   }
 
@@ -56,8 +62,8 @@ float Kd =0;
     current_angle = alpha * (current_angle + gyro_rate_y * dt) + (1 - alpha) * acc_angle_pitch; //complimentary filter formula
     calculatePID();
     MotorControls();
-    delay(5);
-    printAllValues(); //debug
+    //delay(5);
+  //  printAllValues(); //debug
   }
 
   void readIMU() {
@@ -73,17 +79,18 @@ float Kd =0;
   delay(2000);
   
   long gx_sum = 0, gy_sum = 0, gz_sum = 0;
-  int samples =1000;
+  int samples =1000; // taking 1000 reading avg for callibration
   for (int i = 0; i < samples; i++) {
     int16_t gx, gy, gz;
     mpu.getRotation(&gx, &gy, &gz);
-    gx_sum += gx;
+    gx_sum += gx;  //total sum
     gy_sum += gy;
     gz_sum += gz;
     delay(2);
   }
+  // avg = total sum/no of samples
   gyroX_offset = gx_sum / samples;
-  gyroY_offset = gy_sum / samples;
+  gyroY_offset = gy_sum / samples;  
   gyroZ_offset = gz_sum / samples;
   
   Serial.print("Gyro Offsets - X: "); Serial.print(gyroX_offset);
@@ -101,15 +108,23 @@ float Kd =0;
    pidVal=abs(pidVal);
 }
 
-  int speed = map(pidVal, 0, 100, 2000, 200);
-  speed= constrain(speed, 200, 2000);
+
+
+if(pidVal > 1.0) {
+    int stepsPerSecond = map(pidVal, 1, 100, 50, 1000);  // Fixed mapping
+    int stepDelay = 1000000 / stepsPerSecond;  // Convert to microseconds
+    
+    int pulsesToSend = (stepsPerSecond * dt);
+ for(int i = 0; i < pulsesToSend; i++) {
   digitalWrite(RIGHT_PUL_PIN,HIGH);
   digitalWrite(LEFT_PUL_PIN,HIGH);
-  delay(10);
+  delayMicroseconds(5);
   digitalWrite(RIGHT_PUL_PIN,LOW);
   digitalWrite(LEFT_PUL_PIN,LOW);
-  delayMicroseconds(speed); //
+  delayMicroseconds(stepDelay);
+  }
 } 
+ }
 
   void calculatePID(){
   error = current_angle - target_angle;
