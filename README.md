@@ -260,7 +260,7 @@ The code outputs real-time debugging information:
 - [PID Control Theory](https://en.wikipedia.org/wiki/PID_controller)
 
 ### SRM Team Robocon Resources
-- [SRM Team Robocon Official Website]([https://srmrobocon.com](https://www.srmteamrobocon.com/))
+- [SRM Team Robocon Official Website]([https://www.srmteamrobocon.com/](https://www.srmteamrobocon.com/))
 - Self-balancing robot theory and implementations
 - Stepper motor control with TB6600 drivers
 - ESP32 programming for robotics applications
